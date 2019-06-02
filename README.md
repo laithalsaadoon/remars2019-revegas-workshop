@@ -137,6 +137,31 @@ You will likely see an error message, "Kernel not found." Use the dropdown box t
 
 You have now setup a SageMaker notebook instance from which you can train a neural network to detect objects. Follow each step in the notebook to continue the lab.
 
+### Reinforcement learning:: Q-learning style
+
+Upload a pre-built notebook to Jupyter. First, [download and save the notebook](https://github.com/laithalsaadoon/awsremars2019-revegas-workshop/raw/master/lab/rl_notebook.zip), then click the "Upload" button and locate the file you just downloaded. Click the "Upload" button to complete the process.
+
+Open a terminal as shown here:
+
+![img/open_terminal.jpg](img/open_terminal.jpg)
+
+Type the following commands:
+
+`cd Sagemaker`
+
+`unzip rl-notebook.zip`
+
+
+Return to the Jupyter Home page, and click on `rl_workshop_1_FINAL.ipynb`. 
+
+
+
+
+
+You will likely see an error message, "Kernel not found." Use the dropdown box to select the `conda_mxnet_p36` kernel, then click the **Set Kernel** button.
+
+Follow each step in the notebook to continue with the RL lab.
+
 # Important Note: At the end of this workshop, do not forget to shut down your resources. The ml.p2.xlarge instance is over $1/hr.
 
 
