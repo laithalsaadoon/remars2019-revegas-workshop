@@ -24,7 +24,7 @@ We provide a training set of 5,000 images of playing cards in Amazon S3 that are
 
 Amazon SageMaker is a fully-managed service that covers the entire machine learning workflow to label and prepare your data, choose an algorithm, train the model, tune and optimize it for deployment, make predictions, and take action. For this workshop, we'll use Notebooks in Amazon SageMaker to design, build, and train our model.
 
-We will use an AWS CloudFormation Template to automate the deployment of the Amazon SageMaker Notebook Instance, IAM Roles, and IAM Policies to streamline the lab.
+We will use an AWS CloudFormation Template to automate the deployment of the Amazon SageMaker Notebook Instance, IAM Roles, and IAM Policies to streamline the lab. Before clicking the Launch Stack button, be sure you have logged into the AWS Management Console via Event Engine:
 
 [![Launch Stack](./img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=blackjackworkshop&templateURL=https://remars2019-revegas-trainingdata.s3.amazonaws.com/deploy_notebook.yaml)
 
