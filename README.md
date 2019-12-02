@@ -1,4 +1,4 @@
-# Lab Guide: re:Vegas Blackjack 
+# Lab Guide: AI/ML Blackjack Challenge 
 
 ## Table of Contents
 
@@ -7,14 +7,16 @@
 3. Setup your SageMaker notebook
 4. Detecting playing cards using Amazon SageMaker's built-in object detection
 
-### Important Note: At the end of this workshop, do not forget to shut down your resources. The ml.p2.xlarge instance is over $1/hr.
+### Important Note: For the duration of this lab, be sure to select the US East (N. Virginia) AWS Region:
+
+![us-east-1](img/select&#32;US&#32;East&#32;(N.&#32;Virginia).png)
 
 
 ### Introduction
 
 In this workshop, you will learn how to use machine learning and computer vision to detection the rank and suit of playing cards from a [Standard 52-card deck](https://en.wikipedia.org/wiki/Standard_52-card_deck). We'll use cloud services from AWS to develop, train, and deploy for prediction a deep neural network model.
 
-Object detection is the process of identifying and localizing objects in an image. A typical object detection solution takes an image as input and provides a bounding box on the image where an object of interest is found. It also identifies what type of object the box encapsulates. To create such a solution, we need to acquire and process a traning dataset, create and setup a training job for the alorithm so that it can learn about the dataset. Finally, we can then host the trained model in an endpoint, to which we can supply images.
+Object detection is the process of identifying and localizing objects in an image. A typical object detection solution takes an image as input and provides a bounding box on the image where an object of interest is found. It also identifies what type of object the box encapsulates. To create such a solution, we need to acquire and process a training dataset, create and setup a training job for the algorithm so that it can learn about the dataset. Finally, we can then host the trained model in an endpoint, to which we can supply images.
 
 We provide a training set of 5,000 images of playing cards in Amazon S3 that are synthetically displayed with different backgrounds, rotation, zoom, and other image augmentation techniques. This notebook is an end-to-end example showing how the Amazon SageMaker Object Detection algorithm can be used such playing card images to detect playing cards on a blackjack table. Amazon SageMaker's object detection algorithm uses the Single Shot multibox Detector [(SSD)](https://arxiv.org/abs/1512.02325) algorithm, and this notebook uses a [ResNet](https://arxiv.org/pdf/1603.05027.pdf) base network with that algorithm.
 
@@ -113,15 +115,15 @@ In SageMaker's left navigation menu, click "Notebook Instances" under **Notebook
 
 [![Create notebook instance](img/create-notebook-instance.png)](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/create) <!-- .element width="438" -->
 
-Fill out the "Notebook instance settings" form as shown below. You can use any Notebook instance type you want, but for best results choose one of the accelerated computing instances, like the __ml.p2.xlarge__. 
+Fill out the "Notebook instance settings" form as shown below. Please select __ml.t2.medium__ as the "Notebook instance type". 
 
 ![img/notebook-instance-settings.png](img/notebook-instance-settings.png)
 
-Next, fill out the "Permissions and encryption" form as shown below. For the **IAM Role** setting, choose "Enter a custom IAM role ARN".
+Next, fill out the "Permissions and encryption" form as shown below. For the **IAM Role** setting, choose "Enter a custom IAM role ARN". Copy and paste the **Role ARN** from the previous steps.  
 
 ![img/permissions-and-encryption.png](img/permissions-and-encryption.png)
 
-Scroll to the bototm of the form and click the **Create notebook instance**. It will take a few minutes to provision the instance that runs your notebook. Once it finishes provisioning, you'll see an "InService" status. Click the [Open Jupyter link](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/openNotebook/revegas-blackjack?view=classic) link to open your notebook.
+Scroll to the bottom of the form and click the **Create notebook instance**. It will take a few minutes to provision the instance that runs your notebook. Once it finishes provisioning, you'll see an "InService" status. Click the [Open Jupyter link](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/openNotebook/revegas-blackjack?view=classic) link to open your notebook.
 
 ![img/notebook-instances.png](img/notebook-instances.png)
 
@@ -131,40 +133,6 @@ You will likely see an error message, "Kernel not found." Use the dropdown box t
 
 ![img/kernel-not-found.png](img/kernel-not-found.png)
 
-### Detecting playing cards using Amazon SageMaker's built-in object detection
-
 #### Congratulations!
 
 You have now setup a SageMaker notebook instance from which you can train a neural network to detect objects. Follow each step in the notebook to continue the lab.
-
-### Reinforcement learning:: Q-learning style
-
-Upload a pre-built notebook to Jupyter. First, [download and save the notebook](https://github.com/laithalsaadoon/awsremars2019-revegas-workshop/raw/master/lab/rl_notebook.zip), then click the "Upload" button and locate the file you just downloaded. Click the "Upload" button to complete the process.
-
-Open a terminal as shown here:
-
-![img/open_terminal.jpg](img/open_terminal.jpg)
-
-Type the following commands:
-
-`cd Sagemaker`
-
-`unzip rl-notebook.zip`
-
-
-Return to the Jupyter Home page, and click on `rl_workshop_1_FINAL.ipynb`. 
-
-
-
-
-
-You will likely see an error message, "Kernel not found." Use the dropdown box to select the `conda_mxnet_p36` kernel, then click the **Set Kernel** button.
-
-Follow each step in the notebook to continue with the RL lab.
-
-# Important Note: At the end of this workshop, do not forget to shut down your resources. The ml.p2.xlarge instance is over $1/hr.
-
-
-
-
-
