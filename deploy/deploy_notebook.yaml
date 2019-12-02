@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+
+Resources: 
+
+  iamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+      Path: "/"
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "sagemaker.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+  
+  iamPolicy:
+    DependsOn: iamRole
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "blackjackNotebookPolicy"
+      Roles:
+        - 
+          !Ref iamRole
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: "Allow"
+            Action:
+              - "s3:ListBucket"
+            Resource:
+              - "arn:aws:s3:::remars2019-revegas-trainingdata"
+          - 
+            Effect: "Allow"
+            Action: 
+              - "s3:*"
+            Resource:
+              - "arn:aws:s3:::remars2019-revegas-trainingdata/*"
+
+  BasicNotebookInstance:
+    Type: AWS::SageMaker::NotebookInstance
+    Properties:
+      InstanceType: ml.t2.medium
+      NotebookInstanceName: BlackjackNotebookInstance
+      RoleArn: !GetAtt 'iamRole.Arn'
+      LifecycleConfigName: !GetAtt 'NotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName'
+
+  NotebookInstanceLifecycleConfig:
+    Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+    Properties:
+      NotebookInstanceLifecycleConfigName: "copy-jupyter-notebook"
+      OnStart:
+        - Content: !Base64
+            Fn::Join:
+              - ;
+              - - cd /home/ec2-user/SageMaker
+                - aws s3 cp "s3://remars2019-revegas-trainingdata/Detecting Playing Cards Using Amazon SageMaker Built-In Object Detection.ipynb" lab_notebook.ipynb

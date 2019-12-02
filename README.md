@@ -20,119 +20,53 @@ Object detection is the process of identifying and localizing objects in an imag
 
 We provide a training set of 5,000 images of playing cards in Amazon S3 that are synthetically displayed with different backgrounds, rotation, zoom, and other image augmentation techniques. This notebook is an end-to-end example showing how the Amazon SageMaker Object Detection algorithm can be used such playing card images to detect playing cards on a blackjack table. Amazon SageMaker's object detection algorithm uses the Single Shot multibox Detector [(SSD)](https://arxiv.org/abs/1512.02325) algorithm, and this notebook uses a [ResNet](https://arxiv.org/pdf/1603.05027.pdf) base network with that algorithm.
 
-### Create a SageMaker role and policy
+### Initiate the lab
 
 Amazon SageMaker is a fully-managed service that covers the entire machine learning workflow to label and prepare your data, choose an algorithm, train the model, tune and optimize it for deployment, make predictions, and take action. For this workshop, we'll use Notebooks in Amazon SageMaker to design, build, and train our model.
 
-To use SageMaker, you'll need to use an existing account from Amazon Web Services (AWS), or create a new one at [https://aws.amazon.com/](https://aws.amazon.com/).
+We will use an AWS CloudFormation Template to automate the deployment of the Amazon SageMaker Notebook Instance, IAM Roles, and IAM Policies to streamline the lab.
 
-You'll also need a custom Identity and Access Management (IAM) role and policy to give your notebook access to SageMaker and Amazon S3. Let's create those now.
+[![Launch Stack](./img/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=blackjackworkshop&templateURL=https://remars2019-revegas-trainingdata.s3.amazonaws.com/deploy_notebook.yaml)
 
-Log into the [AWS console](https://console.aws.amazon.com/), click the "Services" dropdown use the search box to find "IAM", 
-or visit the IAM console directly at [https://console.aws.amazon.com/iam/home?region=us-east-1#/home](https://console.aws.amazon.com/iam/home?region=us-east-1#/home). 
+Accept the defaults and click next:
+
+![step 1](./img/step-1-deploy-stack.png)
 
 
-#### Create a role
+Enter a new stack name or leave the default:
 
-You'll create a role first. On the left navigation menu, click "Roles," then click the **Create role** button to create a new role. Under "Choose the service that will use this role," select "SageMaker",
+![step 2](./img/step-2-stack-name.png)
 
-![img/create-role.png](img/create-role.png)
 
-then, click the **Next: Permissions** button.
+On the third screen, accept the defaults and click Next:
 
-You'll notice an "AmazonSageMakerFullAccess" policy is given by default for this role. Finish the creation of this role with the default permissions by clicking **Next: Tags**, then **Next: Review**, and finally giving the role a name and optional description before clicking the **Create role** button.
+![step 3](./img/step-3-accept-defaults.png)
 
-![img/create-role.png](img/review-role.png)
 
-#### Add a policy
+On the last screen, verify the template, and check the box next to the statement, "I acknowledge that AWS CloudFormation might create IAM resources".
 
-Now that your role is created, let's add a policy to it, which will give our notebook access to the S3 bucket that contains our training data. 
+![step 4](./img/step-4-review-acknowledge-iam.png)
 
-Make sure you're on [IAM's Roles](https://console.aws.amazon.com/iam/home?region=us-east-1#/roles) page, then filter the roles by typing "revegas" into the search box. 
+The template should take around 4-5 minutes to complete.
 
-![img/filter-roles.png](img/filter-roles.png)  <!-- .element width="874" -->
+### Start the machine learning lab
 
-Click the ["revegas-blackjack" link](https://console.aws.amazon.com/iam/home?region=us-east-1#/roles/revegas-blackjack) to look load the role summary, then click the **Attach policies** button, then click the **Create policy** button. This will open a new tab.
+Follow the below link to open the Amazon SageMaker Notebook Instance in your browser:
 
-Click the "JSON" tab as shown below, 
+[Open your SageMaker Notebook Instance](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/openNotebook/BlackjackNotebookInstance?view=classic)
 
-![img/create-json-policy.png](img/create-json-policy.png) <!-- .element width="778" -->
+In the Jupyter page, open the notebook file we preloaded for you by clicking on **lab_notebook.ipynb**
 
-and enter the following JSON code:
+![image](./img/step5-open-ipynb.png)
 
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Action": [
-                    "s3:ListBucket"
-                ],
-                "Effect": "Allow",
-                "Resource": [
-                    "arn:aws:s3:::remars2019-revegas-trainingdata"
-                ]
-            },
-            {
-                "Action": [
-                    "s3:*",
-                    "s3:PutObject",
-                    "s3:DeleteObject"
-                ],
-                "Effect": "Allow",
-                "Resource": [
-                    "arn:aws:s3:::remars2019-revegas-trainingdata/*"
-                ]
-            }
-        ]
-    }
 
-Then, click the **Review policy** button.
+Select the kernel as below:
 
-Fill out the "Name" and "Description" fields of the policy similar to the screenshot below,
+![image](./img/step6-setkernal.png)
 
-![img/review-policy.png](img/review-policy.png)
 
-then click the **Create policy** button.
+Finally, click on **Not Trusted** and then click **Trust** to trust the notebook.
 
-Go back to the tab containing your roles, and filter policies by the phrase "revegas". You will probably have to hit the refresh button near the upper-right to see your newly-created policy.
+![image](./img/step7-trust.png)
 
-![img/select-policy.png](img/select-policy.png)
-
-Tick the checkbox next to the policy, then click the **Attach policy** button. Verify that your role has two policies now:
-
-* AmazonSageMakerFullAccess
-* revegas-blackjack
-
-![img/verify-policies.png](img/verify-policies.png)
-
-**Note: Make sure to copy the "Role ARN", you'll need it for the next session**
-
-### Setup your SageMaker notebook
-
-Click the "Services" dropdown use the search box to find "SageMaker", or visit the SageMaker console directly at [https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/). 
-
-In SageMaker's left navigation menu, click "Notebook Instances" under **Notebook**, then click the "Create notebook instance" button on the right side of the page, or use the link below.
-
-[![Create notebook instance](img/create-notebook-instance.png)](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/create) <!-- .element width="438" -->
-
-Fill out the "Notebook instance settings" form as shown below. Please select __ml.t2.medium__ as the "Notebook instance type". 
-
-![img/notebook-instance-settings.png](img/notebook-instance-settings.png)
-
-Next, fill out the "Permissions and encryption" form as shown below. For the **IAM Role** setting, choose "Enter a custom IAM role ARN". Copy and paste the **Role ARN** from the previous steps.  
-
-![img/permissions-and-encryption.png](img/permissions-and-encryption.png)
-
-Scroll to the bottom of the form and click the **Create notebook instance**. It will take a few minutes to provision the instance that runs your notebook. Once it finishes provisioning, you'll see an "InService" status. Click the [Open Jupyter link](https://console.aws.amazon.com/sagemaker/home?region=us-east-1#/notebook-instances/openNotebook/revegas-blackjack?view=classic) link to open your notebook.
-
-![img/notebook-instances.png](img/notebook-instances.png)
-
-Now it's time to upload a pre-built notebook to Jupyter. First, [download and save the notebook](https://s3.amazonaws.com/remars2019-revegas-trainingdata/Detecting+Playing+Cards+Using+Amazon+SageMaker+Built-In+Object+Detection.ipynb), then click the "Upload" button and locate the file you just downloaded. Click the "Upload" button to complete the process, then click on the notebook to open it.
-
-You will likely see an error message, "Kernel not found." Use the dropdown box to select the `conda_mxnet_p36` kernel, then click the **Set Kernel** button.
-
-![img/kernel-not-found.png](img/kernel-not-found.png)
-
-#### Congratulations!
-
-You have now setup a SageMaker notebook instance from which you can train a neural network to detect objects. Follow each step in the notebook to continue the lab.
+You are now ready to run through each Jupyter cell!
